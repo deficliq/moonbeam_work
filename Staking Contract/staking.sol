@@ -72,30 +72,30 @@ contract ICliq {
     function approve(address , uint256) public pure returns (bool);
     function burn(uint256) public pure;
     function mint(uint256) public pure returns(bool);
-    function getContractBNBBalance() public pure returns(uint256);
+    function getContractDEVBalance() public pure returns(uint256);
  }
 
 /**
  * @title Staking
- * @dev   Staking Contract for token and BNB staking
+ * @dev   Staking Contract for token and DEV staking
  */
 contract Staking {
     
   using SafeMath for uint256;
   address private _owner;                                           // variable for Owner of the Contract.
-  uint256 private _withdrawTime;                                    // variable to manage withdraw time for BNB and Token
+  uint256 private _withdrawTime;                                    // variable to manage withdraw time for DEV and Token
   uint256 constant public PERIOD_SILVER            = 30;            // variable constant for time period managemnt
   uint256 constant public PERIOD_GOLD              = 60;            // variable constant for time period managemnt
   uint256 constant public PERIOD_PLATINUM          = 90;            // variable constant for time period managemnt
   uint256 constant public WITHDRAW_TIME_SILVER     = 15 * 1 days;   // variable constant to manage withdraw time lock up 
   uint256 constant public WITHDRAW_TIME_GOLD       = 30 * 1 days;   // variable constant to manage withdraw time lock up
   uint256 constant public WITHDRAW_TIME_PLATINUM   = 45 * 1 days;   // variable constant to manage withdraw time lock up
-  uint256 constant public BNB_REWARD_PERCENT_SILVER      = 1332;    // variable constant to manage BNB reward percentage for silver
-  uint256 constant public BNB_REWARD_PERCENT_GOLD        = 3203;    // variable constant to manage BNB reward percentage for gold
-  uint256 constant public BNB_REWARD_PERCENT_PLATINUM    = 5347;    // variable constant to manage BNB reward percentage for platinum
-  uint256 constant public BNB_PENALTY_PERCENT_SILVER     = 821;     // variable constant to manage BNB penalty percentage for silver
-  uint256 constant public BNB_PENALTY_PERCENT_GOLD       = 1980;    // variable constant to manage BNB penalty percentage for silver
-  uint256 constant public BNB_PENALTY_PERCENT_PLATINUM   = 3307;    // variable constant to manage BNB penalty percentage for silver
+  uint256 constant public DEV_REWARD_PERCENT_SILVER      = 1332;    // variable constant to manage DEV reward percentage for silver
+  uint256 constant public DEV_REWARD_PERCENT_GOLD        = 3203;    // variable constant to manage DEV reward percentage for gold
+  uint256 constant public DEV_REWARD_PERCENT_PLATINUM    = 5347;    // variable constant to manage DEV reward percentage for platinum
+  uint256 constant public DEV_PENALTY_PERCENT_SILVER     = 821;     // variable constant to manage DEV penalty percentage for silver
+  uint256 constant public DEV_PENALTY_PERCENT_GOLD       = 1980;    // variable constant to manage DEV penalty percentage for silver
+  uint256 constant public DEV_PENALTY_PERCENT_PLATINUM   = 3307;    // variable constant to manage DEV penalty percentage for silver
   uint256 constant public TOKEN_REWARD_PERCENT_SILVER    = 10;      // variable constant to manage token reward percentage for silver
   uint256 constant public TOKEN_REWARD_PERCENT_GOLD      = 20;      // variable constant to manage token reward percentage for gold
   uint256 constant public TOKEN_REWARD_PERCENT_PLATINUM  = 30;      // variable constant to manage token reward percentage for platinum
@@ -103,7 +103,7 @@ contract Staking {
   uint256 constant public TOKEN_PENALTY_PERCENT_GOLD     = 6;       // variable constant to manage token penalty percentage for silver
   uint256 constant public TOKEN_PENALTY_PERCENT_PLATINUM = 9;       // variable constant to manage token penalty percentage for silver
   
-  // events to handle staking pause or unpause for token and BNB
+  // events to handle staking pause or unpause for token and DEV
   event Paused();
   event Unpaused();
   
@@ -191,35 +191,35 @@ contract Staking {
     return _ownerTokenAllowance;
   }
   
-  // function to add BNB reward in contract
-  function addBNBReward() external payable onlyOwner returns(bool){
-    _ownerBNBAllowance = _ownerBNBAllowance.add(msg.value);
+  // function to add DEV reward in contract
+  function addDEVReward() external payable onlyOwner returns(bool){
+    _ownerDEVAllowance = _ownerDEVAllowance.add(msg.value);
     return true;
   }
   
-  // function to withdraw added BNB reward in contract
-  function withdrawAddedBNBReward(uint256 amount) external onlyOwner returns(bool){
-    require(amount < _ownerBNBAllowance, "Value is not feasible, Please Try Again!!!");
-    _ownerBNBAllowance = _ownerBNBAllowance.sub(amount);
-    msg.sender.transfer(_ownerBNBAllowance);
+  // function to withdraw added DEV reward in contract
+  function withdrawAddedDEVReward(uint256 amount) external onlyOwner returns(bool){
+    require(amount < _ownerDEVAllowance, "Value is not feasible, Please Try Again!!!");
+    _ownerDEVAllowance = _ownerDEVAllowance.sub(amount);
+    msg.sender.transfer(_ownerDEVAllowance);
     return true;
   }
   
-  // function to get BNB reward in contract
-  function getBNBReward() public view returns(uint256){
-    return _ownerBNBAllowance;
+  // function to get DEV reward in contract
+  function getDEVReward() public view returns(uint256){
+    return _ownerDEVAllowance;
   }
   
-  // function to set BNB limit per user by owner
-  function setBNBLimit(uint256 bnb) external onlyOwner returns(bool){
-    require(bnb != 0, "Zero Amount not Supported, Please Try Again!!!");
-    _bnbLimit = bnb;
+  // function to set DEV limit per user by owner
+  function setDEVLimit(uint256 devAmount) external onlyOwner returns(bool){
+    require(devAmount != 0, "Zero Amount not Supported, Please Try Again!!!");
+    _devLimit = devAmount;
     return true;
   }
   
-  // function to get BNB limit set by owner
-  function getBNBLimit() public view returns(uint256){
-    return _bnbLimit;
+  // function to get DEV limit set by owner
+  function getDEVLimit() public view returns(uint256){
+    return _devLimit;
   }
   
   // function to pause Token Staking
@@ -234,15 +234,15 @@ contract Staking {
     emit Unpaused();
   }
   
-  // function to pause BNB Staking
-  function pauseBNBStaking() public onlyOwner {
-    BNBPaused = true;
+  // function to pause DEV Staking
+  function pauseDEVStaking() public onlyOwner {
+    devPaused = true;
     emit Paused();
   }
 
-  // function to unpause BNB Staking
-  function unpauseBNBStaking() public onlyOwner {
-    BNBPaused = false;
+  // function to unpause DEV Staking
+  function unpauseDEVStaking() public onlyOwner {
+    devPaused = false;
     emit Unpaused();
   }
   
@@ -303,60 +303,60 @@ contract Staking {
   
   /*
   * ----------------------------------------------------------------------------------------------------------------------------
-  * Variable, Mapping for BNB Staking Functionality
+  * Variable, Mapping for DEV Staking Functionality
   * ----------------------------------------------------------------------------------------------------------------------------
   */
   
   // mapping for users with id => address Staking Address
-  mapping (uint256 => address) private _bnbStakingAddress;
+  mapping (uint256 => address) private _devStakingAddress;
   
   // mapping for user with address => id staking id
-  mapping (address => uint256[]) private _bnbStakingId;
+  mapping (address => uint256[]) private _devStakingId;
   
   // mapping for users with id => Staking Time
-  mapping (uint256 => uint256) private _bnbStakingStartTime;
+  mapping (uint256 => uint256) private _devStakingStartTime;
 
   // mapping for users with id => End Time
-  mapping (uint256 => uint256) private _bnbStakingEndTime;
+  mapping (uint256 => uint256) private _devStakingEndTime;
 
-  // mapping for users with id => BNB
-  mapping (uint256 => uint256) private _usersBNB;
+  // mapping for users with id => DEV
+  mapping (uint256 => uint256) private _usersDEV;
   
   // mapping for users with id => Status
-  mapping (uint256 => bool) private _bnbTransactionstatus; 
+  mapping (uint256 => bool) private _devTransactionstatus; 
   
-  // mapping to keep track of final withdraw value of staked BNB
-  mapping(uint256=>uint256) private _finalBNBStakeWithdraw;
+  // mapping to keep track of final withdraw value of staked DEV
+  mapping(uint256=>uint256) private _finalDEVStakeWithdraw;
   
   // mapping to keep track total number of staking days
-  mapping(uint256=>uint256) private _bnbTotalDays;
+  mapping(uint256=>uint256) private _devTotalDays;
 
-  // mapping for BNB deposited by user 
-  mapping(address=>uint256) private _bnbStakedByUser;
+  // mapping for DEV deposited by user 
+  mapping(address=>uint256) private _devStakedByUser;
   
-  // variable to keep count of BNB Staking
-  uint256 private _bnbStakingCount = 0;
+  // variable to keep count of DEV Staking
+  uint256 private _devStakingCount = 0;
   
-  // variable to keep track on BNB reward added by owner
-  uint256 private _ownerBNBAllowance = 0;
+  // variable to keep track on DEV reward added by owner
+  uint256 private _ownerDEVAllowance = 0;
   
-  // variable to set BNB limit by owner
-  uint256 private _bnbLimit = 0;
+  // variable to set DEV limit by owner
+  uint256 private _devLimit = 0;
 
-  // variable for BNB time management
-  uint256 private _bnbTime;
+  // variable for DEV time management
+  uint256 private _devTime;
 
-  // variable for BNB staking pause and unpause mechanism
-  bool public BNBPaused = false;
+  // variable for DEV staking pause and unpause mechanism
+  bool public devPaused = false;
   
-  // variable for total BNB staked by user
-  uint256 public totalStakedBNB = 0;
+  // variable for total DEV staked by user
+  uint256 public totalStakedDEV = 0;
   
-  // variable for total stake BNB in contract
-  uint256 public totalBNBStakesInContract = 0;
+  // variable for total stake DEV in contract
+  uint256 public totalDEVStakesInContract = 0;
   
-  // modifier to check time and input value for BNB Staking 
-  modifier BNBStakeCheck(uint256 timePeriod){
+  // modifier to check time and input value for DEV Staking 
+  modifier DEVStakeCheck(uint256 timePeriod){
     require(msg.value > 0, "Invalid Amount, Please Try Again!!! ");
     require(timePeriod == PERIOD_SILVER || timePeriod == PERIOD_GOLD || timePeriod == PERIOD_PLATINUM, "Enter the Valid Time Period and Try Again !!!");
     _;
@@ -485,61 +485,61 @@ contract Staking {
 
    /*
   * -----------------------------------------------------------------------------------------------------------------------------------
-  * Functions for BNB Staking Functionality
+  * Functions for DEV Staking Functionality
   * -----------------------------------------------------------------------------------------------------------------------------------
   */
  
-  // function to performs staking for user BNB for a specific period of time
-  function stakeBNB(uint256 time) external payable BNBStakeCheck(time) returns(bool){
-    require(BNBPaused == false, "BNB Staking is Paused, Please try after staking get unpaused!!!");
-    require(_bnbStakedByUser[msg.sender].add(msg.value) <= _bnbLimit, "BNB Stake Limit per user is completed, Use different address and try again!!!");
-    _bnbTime = now + (time * 1 days);
-    _bnbStakingCount = _bnbStakingCount + 1 ;
-    _bnbTotalDays[_bnbStakingCount] = time;
-    _bnbStakingAddress[_bnbStakingCount] = msg.sender;
-    _bnbStakingId[msg.sender].push(_bnbStakingCount);
-    _bnbStakingEndTime[_bnbStakingCount] = _bnbTime;
-    _bnbStakingStartTime[_bnbStakingCount] = now;
-    _usersBNB[_bnbStakingCount] = msg.value;
-    _bnbStakedByUser[msg.sender] = _bnbStakedByUser[msg.sender].add(msg.value);
-    _bnbTransactionstatus[_bnbStakingCount] = false;
-    totalBNBStakesInContract = totalBNBStakesInContract.add(msg.value);
-    totalStakedBNB = totalStakedBNB.add(msg.value);
+  // function to performs staking for user DEV for a specific period of time
+  function stakeDEV(uint256 time) external payable DEVStakeCheck(time) returns(bool){
+    require(devPaused == false, "DEV Staking is Paused, Please try after staking get unpaused!!!");
+    require(_devStakedByUser[msg.sender].add(msg.value) <= _devLimit, "DEV Stake Limit per user is completed, Use different address and try again!!!");
+    _devTime = now + (time * 1 days);
+    _devStakingCount = _devStakingCount + 1 ;
+    _devTotalDays[_devStakingCount] = time;
+    _devStakingAddress[_devStakingCount] = msg.sender;
+    _devStakingId[msg.sender].push(_devStakingCount);
+    _devStakingEndTime[_devStakingCount] = _devTime;
+    _devStakingStartTime[_devStakingCount] = now;
+    _usersDEV[_devStakingCount] = msg.value;
+    _devStakedByUser[msg.sender] = _devStakedByUser[msg.sender].add(msg.value);
+    _devTransactionstatus[_devStakingCount] = false;
+    totalDEVStakesInContract = totalDEVStakesInContract.add(msg.value);
+    totalStakedDEV = totalStakedDEV.add(msg.value);
     return true;
   }
 
-  // function to get staking count for BNB
-  function getBNBStakingCount() public view returns(uint256){
-    return _bnbStakingCount;
+  // function to get staking count for DEV
+  function getDEVStakingCount() public view returns(uint256){
+    return _devStakingCount;
   }
   
-  // function to get total Staked BNB
-  function getTotalStakedBNB() public view returns(uint256){
-    return totalStakedBNB;
+  // function to get total Staked DEV
+  function getTotalStakedDEV() public view returns(uint256){
+    return totalStakedDEV;
   }
   
-  // function to calculate reward for the message sender for BNB stake
-  function getBNBRewardDetailsByStakingId(uint256 id) public view returns(uint256){
-    if(_bnbTotalDays[id] == PERIOD_SILVER) {
-        return (_usersBNB[id]*BNB_REWARD_PERCENT_SILVER/100000);
-    } else if(_bnbTotalDays[id] == PERIOD_GOLD) {
-               return (_usersBNB[id]*BNB_REWARD_PERCENT_GOLD/100000);
-      } else if(_bnbTotalDays[id] == PERIOD_PLATINUM) { 
-                 return (_usersBNB[id]*BNB_REWARD_PERCENT_PLATINUM/100000);
+  // function to calculate reward for the message sender for DEV stake
+  function getDEVRewardDetailsByStakingId(uint256 id) public view returns(uint256){
+    if(_devTotalDays[id] == PERIOD_SILVER) {
+        return (_usersDEV[id]*DEV_REWARD_PERCENT_SILVER/100000);
+    } else if(_devTotalDays[id] == PERIOD_GOLD) {
+               return (_usersDEV[id]*DEV_REWARD_PERCENT_GOLD/100000);
+      } else if(_devTotalDays[id] == PERIOD_PLATINUM) { 
+                 return (_usersDEV[id]*DEV_REWARD_PERCENT_PLATINUM/100000);
         } else{
               return 0;
           }
   }
 
-  // function to calculate penalty for the message sender for BNB stake
-  function getBNBPenaltyDetailByStakingId(uint256 id) public view returns(uint256){
-    if(_bnbStakingEndTime[id] > now){
-        if(_bnbTotalDays[id] == PERIOD_SILVER){
-            return (_usersBNB[id]*BNB_PENALTY_PERCENT_SILVER/100000);
-        } else if(_bnbTotalDays[id] == PERIOD_GOLD) {
-              return (_usersBNB[id]*BNB_PENALTY_PERCENT_GOLD/100000);
-          } else if(_bnbTotalDays[id] == PERIOD_PLATINUM) { 
-                return (_usersBNB[id]*BNB_PENALTY_PERCENT_PLATINUM/100000);
+  // function to calculate penalty for the message sender for DEV stake
+  function getDEVPenaltyDetailByStakingId(uint256 id) public view returns(uint256){
+    if(_devStakingEndTime[id] > now){
+        if(_devTotalDays[id] == PERIOD_SILVER){
+            return (_usersDEV[id]*DEV_PENALTY_PERCENT_SILVER/100000);
+        } else if(_devTotalDays[id] == PERIOD_GOLD) {
+              return (_usersDEV[id]*DEV_PENALTY_PERCENT_GOLD/100000);
+          } else if(_devTotalDays[id] == PERIOD_PLATINUM) { 
+                return (_usersDEV[id]*DEV_PENALTY_PERCENT_PLATINUM/100000);
             } else {
                 return 0;
               }
@@ -548,45 +548,45 @@ contract Staking {
      }
   }
   
-  // function for withdrawing staked BNB
-  function withdrawStakedBNB(uint256 stakingId) public returns(bool){
-    require(_bnbStakingAddress[stakingId] == msg.sender,"No staked token found on this address and ID");
-    require(_bnbTransactionstatus[stakingId] != true,"Either tokens are already withdrawn or blocked by admin");
-      if(_bnbTotalDays[stakingId] == PERIOD_SILVER){
-            require(now >= _bnbStakingStartTime[stakingId] + WITHDRAW_TIME_SILVER, "Unable to Withdraw Stake BNB before 15 days of staking start time, Please Try Again Later!!!");
-            _bnbTransactionstatus[stakingId] = true;
-            if(now >= _bnbStakingEndTime[stakingId]){
-                _finalBNBStakeWithdraw[stakingId] = _usersBNB[stakingId].add(getBNBRewardDetailsByStakingId(stakingId));
-                _bnbStakingAddress[stakingId].transfer(_finalBNBStakeWithdraw[stakingId]);
-                totalBNBStakesInContract = totalBNBStakesInContract.sub(_usersBNB[stakingId]);
+  // function for withdrawing staked DEV
+  function withdrawStakedDEV(uint256 stakingId) public returns(bool){
+    require(_devStakingAddress[stakingId] == msg.sender,"No staked token found on this address and ID");
+    require(_devTransactionstatus[stakingId] != true,"Either tokens are already withdrawn or blocked by admin");
+      if(_devTotalDays[stakingId] == PERIOD_SILVER){
+            require(now >= _devStakingStartTime[stakingId] + WITHDRAW_TIME_SILVER, "Unable to Withdraw Stake DEV before 15 days of staking start time, Please Try Again Later!!!");
+            _devTransactionstatus[stakingId] = true;
+            if(now >= _devStakingEndTime[stakingId]){
+                _finalDEVStakeWithdraw[stakingId] = _usersDEV[stakingId].add(getDEVRewardDetailsByStakingId(stakingId));
+                _devStakingAddress[stakingId].transfer(_finalDEVStakeWithdraw[stakingId]);
+                totalDEVStakesInContract = totalDEVStakesInContract.sub(_usersDEV[stakingId]);
             } else {
-                _finalBNBStakeWithdraw[stakingId] = _usersBNB[stakingId].add(getBNBPenaltyDetailByStakingId(stakingId));
-                _bnbStakingAddress[stakingId].transfer(_finalBNBStakeWithdraw[stakingId]);
-                totalBNBStakesInContract = totalBNBStakesInContract.sub(_usersBNB[stakingId]);
+                _finalDEVStakeWithdraw[stakingId] = _usersDEV[stakingId].add(getDEVPenaltyDetailByStakingId(stakingId));
+                _devStakingAddress[stakingId].transfer(_finalDEVStakeWithdraw[stakingId]);
+                totalDEVStakesInContract = totalDEVStakesInContract.sub(_usersDEV[stakingId]);
               }
-      } else if(_bnbTotalDays[stakingId] == PERIOD_GOLD){
-           require(now >= _bnbStakingStartTime[stakingId] + WITHDRAW_TIME_GOLD, "Unable to Withdraw Stake BNB before 30 days of staking start time, Please Try Again Later!!!");
-           _bnbTransactionstatus[stakingId] = true;
-            if(now >= _bnbStakingEndTime[stakingId]){
-                _finalBNBStakeWithdraw[stakingId] = _usersBNB[stakingId].add(getBNBRewardDetailsByStakingId(stakingId));
-                _bnbStakingAddress[stakingId].transfer(_finalBNBStakeWithdraw[stakingId]);
-                totalBNBStakesInContract = totalBNBStakesInContract.sub(_usersBNB[stakingId]);
+      } else if(_devTotalDays[stakingId] == PERIOD_GOLD){
+           require(now >= _devStakingStartTime[stakingId] + WITHDRAW_TIME_GOLD, "Unable to Withdraw Stake DEV before 30 days of staking start time, Please Try Again Later!!!");
+           _devTransactionstatus[stakingId] = true;
+            if(now >= _devStakingEndTime[stakingId]){
+                _finalDEVStakeWithdraw[stakingId] = _usersDEV[stakingId].add(getDEVRewardDetailsByStakingId(stakingId));
+                _devStakingAddress[stakingId].transfer(_finalDEVStakeWithdraw[stakingId]);
+                totalDEVStakesInContract = totalDEVStakesInContract.sub(_usersDEV[stakingId]);
             } else {
-                _finalBNBStakeWithdraw[stakingId] = _usersBNB[stakingId].add(getBNBPenaltyDetailByStakingId(stakingId));
-                _bnbStakingAddress[stakingId].transfer(_finalBNBStakeWithdraw[stakingId]);
-                totalBNBStakesInContract = totalBNBStakesInContract.sub(_usersBNB[stakingId]);
+                _finalDEVStakeWithdraw[stakingId] = _usersDEV[stakingId].add(getDEVPenaltyDetailByStakingId(stakingId));
+                _devStakingAddress[stakingId].transfer(_finalDEVStakeWithdraw[stakingId]);
+                totalDEVStakesInContract = totalDEVStakesInContract.sub(_usersDEV[stakingId]);
               }
-      } else if(_bnbTotalDays[stakingId] == PERIOD_PLATINUM){
-           require(now >= _bnbStakingStartTime[stakingId] + WITHDRAW_TIME_PLATINUM, "Unable to Withdraw Stake BNB before 45 days of staking start time, Please Try Again Later!!!");
-           _bnbTransactionstatus[stakingId] = true;
-           if(now >= _bnbStakingEndTime[stakingId]){
-               _finalBNBStakeWithdraw[stakingId] = _usersBNB[stakingId].add(getBNBRewardDetailsByStakingId(stakingId));
-               _bnbStakingAddress[stakingId].transfer(_finalBNBStakeWithdraw[stakingId]);
-               totalBNBStakesInContract = totalBNBStakesInContract.sub(_usersBNB[stakingId]);
+      } else if(_devTotalDays[stakingId] == PERIOD_PLATINUM){
+           require(now >= _devStakingStartTime[stakingId] + WITHDRAW_TIME_PLATINUM, "Unable to Withdraw Stake DEV before 45 days of staking start time, Please Try Again Later!!!");
+           _devTransactionstatus[stakingId] = true;
+           if(now >= _devStakingEndTime[stakingId]){
+               _finalDEVStakeWithdraw[stakingId] = _usersDEV[stakingId].add(getDEVRewardDetailsByStakingId(stakingId));
+               _devStakingAddress[stakingId].transfer(_finalDEVStakeWithdraw[stakingId]);
+               totalDEVStakesInContract = totalDEVStakesInContract.sub(_usersDEV[stakingId]);
            } else {
-               _finalBNBStakeWithdraw[stakingId] = _usersBNB[stakingId].add(getBNBPenaltyDetailByStakingId(stakingId));
-               _bnbStakingAddress[stakingId].transfer(_finalBNBStakeWithdraw[stakingId]);
-               totalBNBStakesInContract = totalBNBStakesInContract.sub(_usersBNB[stakingId]);
+               _finalDEVStakeWithdraw[stakingId] = _usersDEV[stakingId].add(getDEVPenaltyDetailByStakingId(stakingId));
+               _devStakingAddress[stakingId].transfer(_finalDEVStakeWithdraw[stakingId]);
+               totalDEVStakesInContract = totalDEVStakesInContract.sub(_usersDEV[stakingId]);
             }
       } else {
           return false;
@@ -594,14 +594,14 @@ contract Staking {
     return true;
   }
   
-  // function to get Final Withdraw Staked value for BNB
-  function getFinalBNBStakeWithdraw(uint256 id) public view returns(uint256){
-    return _finalBNBStakeWithdraw[id];
+  // function to get Final Withdraw Staked value for DEV
+  function getFinalDEVStakeWithdraw(uint256 id) public view returns(uint256){
+    return _finalDEVStakeWithdraw[id];
   }
   
-  // function to get total BNB stake in contract
-  function getTotalBNBStakesInContract() public view returns(uint256){
-      return totalBNBStakesInContract;
+  // function to get total DEV stake in contract
+  function getTotalDEVStakesInContract() public view returns(uint256){
+      return totalDEVStakesInContract;
   }
   
   /*
@@ -654,56 +654,56 @@ contract Staking {
   
   /*
   * ----------------------------------------------------------------------------------------------------------------------------------
-  * Get Functions for Stake BNB Functionality
+  * Get Functions for Stake DEV Functionality
   * ----------------------------------------------------------------------------------------------------------------------------------
   */
 
-  // function to get BNB Staking address by id
-  function getBNBStakingAddressById(uint256 id) external view returns (address){
-    require(id <= _bnbStakingCount,"Unable to reterive data on specified id, Please try again!!");
-    return _bnbStakingAddress[id];
+  // function to get DEV Staking address by id
+  function getDEVStakingAddressById(uint256 id) external view returns (address){
+    require(id <= _devStakingCount,"Unable to reterive data on specified id, Please try again!!");
+    return _devStakingAddress[id];
   }
   
-  // function to get BNB Staking id by address
-  function getBNBStakingIdByAddress(address add) external view returns(uint256[]){
+  // function to get DEV Staking id by address
+  function getDEVStakingIdByAddress(address add) external view returns(uint256[]){
     require(add != address(0),"Invalid Address, Pleae Try Again!!!");
-    return _bnbStakingId[add];
+    return _devStakingId[add];
   }
   
-  // function to get BNB Staking Starting time by id
-  function getBNBStakingStartTimeById(uint256 id) external view returns(uint256){
-    require(id <= _bnbStakingCount,"Unable to reterive data on specified id, Please try again!!");
-    return _bnbStakingStartTime[id];
+  // function to get DEV Staking Starting time by id
+  function getDEVStakingStartTimeById(uint256 id) external view returns(uint256){
+    require(id <= _devStakingCount,"Unable to reterive data on specified id, Please try again!!");
+    return _devStakingStartTime[id];
   }
   
-  // function to get BNB Staking End time by id
-  function getBNBStakingEndTimeById(uint256 id) external view returns(uint256){
-    require(id <= _bnbStakingCount,"Unable to reterive data on specified id, Please try again!!");
-    return _bnbStakingEndTime[id];
+  // function to get DEV Staking End time by id
+  function getDEVStakingEndTimeById(uint256 id) external view returns(uint256){
+    require(id <= _devStakingCount,"Unable to reterive data on specified id, Please try again!!");
+    return _devStakingEndTime[id];
   }
   
-  // function to get BNB Staking Total Days by Id
-  function getBNBStakingTotalDaysById(uint256 id) external view returns(uint256){
-    require(id <= _bnbStakingCount,"Unable to reterive data on specified id, Please try again!!");
-    return _bnbTotalDays[id];
+  // function to get DEV Staking Total Days by Id
+  function getDEVStakingTotalDaysById(uint256 id) external view returns(uint256){
+    require(id <= _devStakingCount,"Unable to reterive data on specified id, Please try again!!");
+    return _devTotalDays[id];
   }
   
-  // function to get Staked BNB by id
-  function getBNBStakedById(uint256 id) external view returns(uint256){
-    require(id <= _bnbStakingCount,"Unable to reterive data on specified id, Please try again!!");
-    return _usersBNB[id];
+  // function to get Staked DEV by id
+  function getDEVStakedById(uint256 id) external view returns(uint256){
+    require(id <= _devStakingCount,"Unable to reterive data on specified id, Please try again!!");
+    return _usersDEV[id];
   }
 
-  // function to get Staked BNB by address
-  function getBNBStakedByUser(address add) external view returns(uint256){
+  // function to get Staked DEV by address
+  function getDEVStakedByUser(address add) external view returns(uint256){
     require(add != address(0),"Invalid Address, Please try again!!");
-    return _bnbStakedByUser[add];
+    return _devStakedByUser[add];
   }
 
-  // function to get BNB lockstatus by id
-  function getBNBLockStatus(uint256 id) external view returns(bool){
-    require(id <= _bnbStakingCount,"Unable to reterive data on specified id, Please try again!!");
-    return _bnbTransactionstatus[id];
+  // function to get DEV lockstatus by id
+  function getDEVLockStatus(uint256 id) external view returns(bool){
+    require(id <= _devStakingCount,"Unable to reterive data on specified id, Please try again!!");
+    return _devTransactionstatus[id];
   }
 
 }

@@ -337,8 +337,8 @@ interface IERC20 {
       return true;
     }
     
-    //Get BNB balance from this contract 
-    function getContractBNBBalance() public view returns(uint256){
+    //Get DEV balance from this contract 
+    function getContractDEVBalance() public view returns(uint256){
       return(address(this).balance);
     }
 }
